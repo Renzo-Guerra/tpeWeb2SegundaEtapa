@@ -48,57 +48,20 @@
         $propiedades = $this->getPropiedadesSortPrecio($orden);
         return $propiedades;
       }else{
-        // Caso en que el criterio de ordenamiento no exista en la tabla
-        if(!$this->existeColumnaEnTabla($atributo)){
+        // Caso en que el criterio de ordenamiento no exista en la tabla o que $orden sea != de "ASC" y de "DESC"
+        if((!$this->existeColumnaEnTabla($atributo)) || (($orden != "ASC") && ($orden != "DESC"))){
           return null;
         }else{
           // Caso en que el criterio de ordenamiento exista en la tabla y tambien se haya pasado un orden
-          
           /**
-           * Intenté hacerlo asi, pero oh sorpresa, no se puede :), ya que PDO no te deja...
-           *    $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY ? ?");
-           *    $query->execute([$atributo, $orden]);
-           * No me quedó otra mas que un switch...
+           * No se usa el $query->execute([$atributo, $precio]) porq PDO no permite hacerlo asi, 
+           * pero es seguro porq ya se valido que $atributo exista en la tabla, y que $orden sea "ASC" o "DESC", 
+           * no pueden hacer inyeccion.
            */
-          if($orden == "ASC"){
-            switch ($atributo) {
-              case 'id': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY id ASC");break;
-              case 'titulo': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY titulo ASC");break;
-              case 'tipo': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY tipo ASC");break;
-              case 'operacion': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY operacion ASC");break;
-              case 'descripcion': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY descripcion ASC");break;
-              case 'precio': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY precio ASC");break;
-              case 'metros_cuadrados': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY metros_cuadrados ASC");break;
-              case 'ambientes': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY ambientes ASC");break;
-              case 'banios': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY banios ASC");break;
-              case 'permite_mascotas': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY permite_mascotas ASC");break;
-              case 'propietario': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY propietario ASC");break;
-              // No es necesario un default, ya se valido que la columna existe...
-            }
-            echo"1";
-          }else if($orden == "DESC"){
-            switch ($atributo) {
-              case 'id': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY id DESC");break;
-              case 'titulo': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY titulo DESC");break;
-              case 'tipo': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY tipo DESC");break;
-              case 'operacion': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY operacion DESC");break;
-              case 'descripcion': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY descripcion DESC");break;
-              case 'precio': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY precio DESC");break;
-              case 'metros_cuadrados': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY metros_cuadrados DESC");break;
-              case 'ambientes': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY ambientes DESC");break;
-              case 'banios': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY banios DESC");break;
-              case 'permite_mDESCotas': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY permite_mascotas DESC");break;
-              case 'propietario': $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY propietario DESC");break;
-            }
-            echo"2";
-          }else{
-            return null;
-          }
-          
+          $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY $atributo $orden");
           $query->execute();
           $propiedades = $query->fetchAll(PDO::FETCH_OBJ); 
           
-          echo"aca";
           return $propiedades;
         }
       }
@@ -150,7 +113,8 @@
         $query = $this->db->prepare("SHOW COLUMNS FROM `tb_propiedad` LIKE ?");
         $query->execute([$columna]);
         $resultado = $query->fetchAll(PDO::FETCH_OBJ);  
-        
+        // $resultado es un array con objetos de todas las columnas coincidientes.
+        // print_r($resultado);
       } catch (\Throwable $th) {
         $resultado = null;
       }
