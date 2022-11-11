@@ -84,6 +84,14 @@
       return $propiedades;
     }
 
+    /**
+     * A pesar que el metodo de abajo y el de arriba podria unificarlo 
+     * (que por defecto la columna sea "id"), no puedo en si, ya que no 
+     * podria manejar el error de que el id buscado no existe, ya que el 
+     * metodo de arriba devuelve un arreglo de objetos, y el de abajo solo 
+     * 1 objeto.  
+     */
+
     public function getPropiedad($id) {
       $query = $this->db->prepare("SELECT * FROM tb_propiedad WHERE `id` = ?");
       $query->execute([$id]);

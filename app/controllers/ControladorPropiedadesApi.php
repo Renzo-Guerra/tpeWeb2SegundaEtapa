@@ -62,7 +62,7 @@
         $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden' y 'valor'.", 400); die();
       }
       if(($orden == null) && ($atributo == null) && ($valor != null)){
-        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden' y 'atributo'.", 400); die();
+        $this->view->response("Error, no se puede obtener informacion solo brindando 'valor'.", 400); die();
       }
       
       // Casos exitosos
