@@ -41,7 +41,15 @@
         
         return $propiedades;
       }
-      // Caso en que solo se pase el orden
+      // Caso en que solo se pase el atributo, será el "punto 8 de requerimiento funcional optativo"
+      if(($atributo != null) && (!$this->existeColumnaEnTabla($atributo)) && ($orden == null)){
+        $query = $this->db->prepare("SELECT * FROM tb_propiedad WHERE ");
+        $query->execute();
+        $propiedades = $query->fetchAll(PDO::FETCH_OBJ); 
+        
+        return $propiedades;
+      }
+
       if($atributo == null){
         // Reutilizo el metodo de sort por default 
         // (Tranquilamente se podria eliminar el metodo e implementar) el codigo del metodo en este if...
@@ -65,6 +73,15 @@
           return $propiedades;
         }
       }
+    }
+
+    public function getPropiedadesWhere($columna, $valor){
+      // Ya se validó que $columna existe en la tabla, no puede haber inyeccion.
+      $query = $this->db->prepare("SELECT * FROM tb_propiedad WHERE $columna = ?");
+      $query->execute([$valor]);
+      $propiedades = $query->fetchAll(PDO::FETCH_OBJ);
+
+      return $propiedades;
     }
 
     public function getPropiedad($id) {

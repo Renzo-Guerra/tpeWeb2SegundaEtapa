@@ -22,28 +22,60 @@
       return json_decode($this->data);
     }
 
+    
+    // Valida que el orden pasado (en caso de no ser null) sea los aceptados por mi documentacion
+    private function validarOrden($orden){
+      if(($orden != null) && (($orden != "ASC") && ($orden != "DESC"))){
+        $this->view->response("Error, 'orden' invalido", 400); die(); 
+      }
+    }
+
+    // Valida que el atributo (columna) pasada (en caso de no ser null) esté en la tabla 'tb_propiedades'.
+    private function validarColumna($columna){
+      if(($columna != null) && (!($this->propertyModel->existeColumnaEnTabla($columna)))){
+        $this->view->response("Error, 'atributo' invalido", 400); die(); 
+      }
+    }
+    
     /**
      * - Requerimiento funcional optativo numero 9.
      * - (A su vez es el requerimiento funcional obligatorio numero 3).
      * - Si solo se le pasa el orden, los ordenará en base al "precio" de la propiedad.
      */
     public function getPropiedades() {
-      $orden = null;
-      $atributo = null;
+      $orden = null;      // Indica el orden (ASC o DESC)
+      $atributo = null;   // Induca la columna de la tabla (tipo, permite_mascotas, banios, etc)
+      $valor = null;      // En caso de traer solo los elementos donde el campo es igual a x, x seria el valor.
 
-      if(isset($_GET["orden"]))
-        $orden = $_GET["orden"];
+      if(isset($_GET["orden"])) $orden = $_GET["orden"];          
+      if(isset($_GET["atributo"])) $atributo = $_GET["atributo"]; 
+      if(isset($_GET["valor"])) $valor = $_GET["valor"];          
+
+      // Validaciones
+      $this->validarOrden($orden);          
+      $this->validarColumna($atributo);
+      // Podria haber hecho esas 3 validaciones en 1 sola, pero queria que cada una tenga un mensaje "unico"
+      if(($orden != null) && ($atributo != null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden', 'atributo' y 'valor'.", 400); die();
+      }
+      if(($orden != null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden' y 'valor'.", 400); die();
+      }
+      if(($orden == null) && ($atributo == null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden' y 'atributo'.", 400); die();
+      }
       
-      if(isset($_GET["atributo"]))
-        $atributo = $_GET["atributo"];
+      // Casos exitosos
+      if(($atributo != null) && ($valor != null))
+        // Este seria la busqueda 
+        $propiedades = $this->propertyModel->getPropiedadesWhere($atributo, $valor);
+      else{
+        $propiedades = $this->propertyModel->getPropiedades($orden, $atributo);
+      }
 
-      $propiedades = $this->propertyModel->getPropiedades($orden, $atributo);
-      if($propiedades != null)
-        $this->view->response($propiedades, 200);
-      else
-        $this->view->response("Error, 'orden' o 'atributo' invalido", 400);
+      $this->view->response($propiedades, 200);die();
     }
-    
+
     public function getPropiedad($params = null) {
       // obtengo el id del arreglo de params
       $id = $params[':ID'];
