@@ -5,15 +5,14 @@
   require_once './app/Helper.php';
 
   class ControladorPropiedadesApi{
-    private $modeloPropiedad;
     private $modeloPropietario;
     private $view;
     private $data;
     private $helper;
 
     public function __construct() {
-      $this->modeloPropiedad = new ModeloPropiedades();
-      $this->modeloPropietario = new ModeloPropietario();
+      $this->propertyModel = new ModeloPropiedades();
+      $this->userModel = new ModeloPropietario();
       $this->view = new ApiView();
       $this->helper = new Helper();
       
@@ -40,16 +39,25 @@
       if(isset($_GET["valor"])) $valor = $_GET["valor"];          
 
       // Validaciones
-      $this->helper->validarOrden($orden);          
-      $this->helper->validarColumna($atributo);
-      $this->helper->combinacionDeParametrosValidos($atributo);
+      $this->validarOrden($orden);          
+      $this->validarColumna($atributo);
+      // Podria haber hecho esas 3 validaciones en 1 sola, pero queria que cada una tenga un mensaje "unico"
+      if(($orden != null) && ($atributo != null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden', 'atributo' y 'valor'.", 400); die();
+      }
+      if(($orden != null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden' y 'valor'.", 400); die();
+      }
+      if(($orden == null) && ($atributo == null) && ($valor != null)){
+        $this->view->response("Error, no se puede obtener informacion solo brindando 'valor'.", 400); die();
+      }
       
       // Casos exitosos
       if(($atributo != null) && ($valor != null))
         // Este seria la busqueda 
-        $propiedades = $this->modeloPropiedad->getPropiedadesWhere($atributo, $valor);
+        $propiedades = $this->propertyModel->getPropiedadesWhere($atributo, $valor);
       else{
-        $propiedades = $this->modeloPropiedad->getPropiedades($orden, $atributo);
+        $propiedades = $this->propertyModel->getPropiedades($orden, $atributo);
       }
 
       $this->view->response($propiedades, 200);die();
@@ -58,7 +66,7 @@
     public function getPropiedad($params = null) {
       // obtengo el id del arreglo de params
       $id = $params[':ID'];
-      $propiedad = $this->modeloPropiedad->getPropiedad($id);
+      $propiedad = $this->propertyModel->getPropiedad($id);
 
       // si no existe devuelvo 404
       if ($propiedad)
@@ -73,7 +81,7 @@
      */
     public function eliminarPropiedad($params = null) {
       $id = $params[':ID'];
-      $propiedadEliminada = $this->modeloPropiedad->eliminar($id);
+      $propiedadEliminada = $this->propertyModel->eliminar($id);
 
       if ($propiedadEliminada) {
         $this->view->response($propiedadEliminada, 200);
@@ -85,11 +93,11 @@
       $propiedad = $this->getData();
       
       // Validaciones
-      if($this->modeloPropiedad->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); return; die();};
-      if($this->modeloPropiedad->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400);return; die();};
-      if(!$this->modeloPropietario->existeUsuario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$$propiedad->propietario}'"); return; die();}
+      if($this->propertyModel->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); return; die();};
+      if($this->propertyModel->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400);return; die();};
+      if(!$this->userModel->existeUsuario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$$propiedad->propietario}'"); return; die();}
       
-      $this->modeloPropiedad->agregarPropiedad($propiedad);
+      $this->propertyModel->agregarPropiedad($propiedad);
       $this->view->response("Nueva propiedad agregada", 201);
     }
 

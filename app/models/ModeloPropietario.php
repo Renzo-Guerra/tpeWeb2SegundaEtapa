@@ -1,5 +1,5 @@
 <?php
-  class ModeloUsuario{
+  class ModeloPropietario{
     private $db;
 
     public function __construct(){
