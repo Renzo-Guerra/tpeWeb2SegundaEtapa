@@ -15,7 +15,7 @@
       }
     }
 
-    public function combinacionDeParametrosValidos(){
+    public function combinacionDeParametrosValidos($orden, $atributo, $valor){
       // Podria haber hecho esas 3 validaciones en 1 sola, pero queria que cada una tenga un mensaje "unico"
       if(($orden != null) && ($atributo != null) && ($valor != null)){
         $this->view->response("Error, no se puede obtener informacion por la combinacion 'orden', 'atributo' y 'valor'.", 400); die();

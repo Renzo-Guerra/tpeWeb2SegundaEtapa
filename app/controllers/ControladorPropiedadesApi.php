@@ -5,15 +5,15 @@
   require_once './app/Helper.php';
 
   class ControladorPropiedadesApi{
-    private $modeloPropiedad;
-    private $modeloPropietario;
+    private $modeloPropiedades;
+    private $modeloPropietarios;
     private $view;
     private $data;
     private $helper;
 
     public function __construct() {
-      $this->modeloPropiedad = new ModeloPropiedades();
-      $this->modeloPropietario = new ModeloPropietario();
+      $this->modeloPropiedades = new ModeloPropiedades();
+      $this->modeloPropietarios = new ModeloPropietario();
       $this->view = new ApiView();
       $this->helper = new Helper();
       
@@ -42,14 +42,20 @@
       // Validaciones
       $this->helper->validarOrden($orden);          
       $this->helper->validarColumna($atributo);
-      $this->helper->combinacionDeParametrosValidos($atributo);
-      
+      $this->helper->combinacionDeParametrosValidos($orden, $atributo, $valor);
       // Casos exitosos
-      if(($atributo != null) && ($valor != null))
-        // Este seria la busqueda 
-        $propiedades = $this->modeloPropiedad->getPropiedadesWhere($atributo, $valor);
-      else{
-        $propiedades = $this->modeloPropiedad->getPropiedades($orden, $atributo);
+      if(($atributo == null) && ($valor == null) && ($orden == null)){
+        // Caso "vanilla"
+        $propiedades = $this->modeloPropiedades->getPropiedades();
+      }else if(($atributo != null) && ($valor != null)){
+        // Este seria la busqueda del opcional 8 
+        $propiedades = $this->modeloPropiedades->getPropiedadesDonde($atributo, $valor);
+      }else if(($atributo != null) && ($orden != null)){
+        // Este seria la busqueda del opcional 9 
+        $propiedades = $this->modeloPropiedades->getPropiedadesOrdenadas($atributo, $orden);
+      }else if($orden != null){
+        // Este seria el punto 3 de los obligatorios
+        $propiedades = $this->modeloPropiedades->getPropiedadesOrdenadas($atributo, $orden);
       }
 
       $this->view->response($propiedades, 200);die();
@@ -58,7 +64,7 @@
     public function getPropiedad($params = null) {
       // obtengo el id del arreglo de params
       $id = $params[':ID'];
-      $propiedad = $this->modeloPropiedad->getPropiedad($id);
+      $propiedad = $this->modeloPropiedades->getPropiedadesDonde($id);
 
       // si no existe devuelvo 404
       if ($propiedad)
@@ -73,7 +79,7 @@
      */
     public function eliminarPropiedad($params = null) {
       $id = $params[':ID'];
-      $propiedadEliminada = $this->modeloPropiedad->eliminar($id);
+      $propiedadEliminada = $this->modeloPropiedades->eliminar($id);
 
       if ($propiedadEliminada) {
         $this->view->response($propiedadEliminada, 200);
@@ -85,11 +91,11 @@
       $propiedad = $this->getData();
       
       // Validaciones
-      if($this->modeloPropiedad->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); return; die();};
-      if($this->modeloPropiedad->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400);return; die();};
-      if(!$this->modeloPropietario->existeUsuario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$$propiedad->propietario}'"); return; die();}
+      if($this->modeloPropiedades->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); return; die();};
+      if($this->modeloPropiedades->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400);return; die();};
+      if(!$this->modeloPropietarios->existeUsuario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$$propiedad->propietario}'"); return; die();}
       
-      $this->modeloPropiedad->agregarPropiedad($propiedad);
+      $this->modeloPropiedades->agregarPropiedad($propiedad);
       $this->view->response("Nueva propiedad agregada", 201);
     }
 

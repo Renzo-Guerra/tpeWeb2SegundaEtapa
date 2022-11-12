@@ -6,9 +6,25 @@
       $this->db = new PDO('mysql:host=localhost;'.'dbname=db_tpweb;charset=utf8', 'root', '');
     }
     
+    /**
+     *  Devuelve todos los propietarios ordenados ascendente o descendentemente por 
+     *  una columna de la tabla especificada (En caso de no pasar $atributo, por default toma 'apellido').
+     */
+    public function getPropiedadesOrdenadas($atributo = 'apellido', $orden) {
+      if($orden = "ASC")
+        $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY $atributo ASC");
+      else
+        $query = $this->db->prepare("SELECT * FROM tb_propiedad ORDER BY $atributo DESC");
+
+      $query->execute();
+      $propiedades = $query->fetchAll(PDO::FETCH_OBJ); 
+        
+      return $propiedades;
+    }
+
     // Determines weather a user already has that specific dni
     function existeUsuario($user_dni){
-      $query = $this->db->prepare("SELECT * FROM `tb_propietario` WHERE `dni` = ?");
+      $query = $this->db->prepare("SELECT * FROM tb_propietario WHERE `dni` = ?");
       $query->execute([$user_dni]);
       
       $user = $query->fetch(PDO::FETCH_OBJ);
@@ -22,7 +38,7 @@
       $exist = $this->existeUsuario($dni);
       if($exist){ return false;}
 
-      $query = $this->db->prepare("INSERT INTO `tb_propietario` (`dni`, `nombre`, `apellido`, `telefono`, `mail`) VALUES (?, ?, ?, ?, ?)");
+      $query = $this->db->prepare("INSERT INTO tb_propietario (`dni`, `nombre`, `apellido`, `telefono`, `mail`) VALUES (?, ?, ?, ?, ?)");
       $query->execute([$dni, $name, $surname, $phone, $mail]);
       if($this->existeUsuario($dni))
         return getUserById($dni); // Devolvemos el nuevo objeto añadido
@@ -57,5 +73,13 @@
     function editUser($dni, $nombre, $apellido, $telefono, $mail){
       $query = $this->db->prepare("UPDATE tb_propietario SET `nombre` = ?,`apellido` = ?,`telefono` = ?,`mail`= ?  WHERE `dni` = ?");
       $query->execute([$nombre, $apellido, $telefono, $mail, $dni]);
+    }
+    
+    public function camposInvalidosPropietarios($propietario){
+      // Validaciones
+      if(is_null($_GET['dni']) || is_null($_GET['name']) || is_null($_GET['surname']) || is_null($_GET['phone']) || is_null($_GET['mail'])){ return true;}
+      if(empty($_GET['dni']) || empty($_GET['name']) || empty($_GET['surname']) || empty($_GET['phone']) || empty($_GET['mail'])){ return true;}
+      
+      return false;
     }
   }
