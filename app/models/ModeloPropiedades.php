@@ -71,16 +71,6 @@
       }
     }
 
-    public function camposInvalidos($propiedad){
-      // Validaciones
-      if((!isset($propiedad->titulo)) || (!isset($propiedad->tipo)) || (!isset($propiedad->operacion)) || (!isset($propiedad->descripcion)) || (!isset($propiedad->precio)) || (!isset($propiedad->metros_cuadrados)) || (!isset($propiedad->ambientes)) || (!isset($propiedad->banios)) || (!isset($propiedad->permite_mascotas)) || (!isset($propiedad->propietario))){ return true;}
-      if(is_null($propiedad->titulo) || is_null($propiedad->tipo) || is_null($propiedad->operacion) || is_null($propiedad->descripcion) || is_null($propiedad->precio) || is_null($propiedad->metros_cuadrados) || is_null($propiedad->ambientes) || is_null($propiedad->banios) || is_null($propiedad->permite_mascotas) || is_null($propiedad->propietario)){ return true;}
-      if(empty($propiedad->titulo) || empty($propiedad->tipo) || empty($propiedad->operacion) || empty($propiedad->descripcion) || empty($propiedad->precio) || empty($propiedad->metros_cuadrados) || empty($propiedad->ambientes) || empty($propiedad->propietario)){ return true;}
-      if(($propiedad->precio < 0) || ($propiedad->metros_cuadrados <= 0) || ($propiedad->ambientes < 0) || ($propiedad->banios < 0)){return true;}
-      
-      return false;
-    }
-
     function editar($propiedad){
       try {
         $query = $this->db->prepare("UPDATE tb_propiedad SET `titulo` = ?,`tipo` = ?,`operacion` = ?,`descripcion`= ?,`precio` = ?,`metros_cuadrados` = ?,`ambientes` = ?,`banios` = ?,`permite_mascotas` = ?,`propietario` = ?  WHERE `id` = ?");
@@ -98,6 +88,16 @@
       if(($propiedad->operacion != 'alquiler') && ($propiedad->operacion != 'venta')){ return true;}
       if(($propiedad->permite_mascotas != 1) && ($propiedad->permite_mascotas != 0)){ return true;}
 
+      return false;
+    }
+
+    public function camposInvalidos($propiedad){
+      // Validaciones
+      if((!isset($propiedad->titulo)) || (!isset($propiedad->tipo)) || (!isset($propiedad->operacion)) || (!isset($propiedad->descripcion)) || (!isset($propiedad->precio)) || (!isset($propiedad->metros_cuadrados)) || (!isset($propiedad->ambientes)) || (!isset($propiedad->banios)) || (!isset($propiedad->permite_mascotas)) || (!isset($propiedad->propietario))){ return true;}
+      if(is_null($propiedad->titulo) || is_null($propiedad->tipo) || is_null($propiedad->operacion) || is_null($propiedad->descripcion) || is_null($propiedad->precio) || is_null($propiedad->metros_cuadrados) || is_null($propiedad->ambientes) || is_null($propiedad->banios) || is_null($propiedad->permite_mascotas) || is_null($propiedad->propietario)){ return true;}
+      if(empty($propiedad->titulo) || empty($propiedad->tipo) || empty($propiedad->operacion) || empty($propiedad->descripcion) || empty($propiedad->precio) || empty($propiedad->metros_cuadrados) || empty($propiedad->ambientes) || empty($propiedad->propietario)){ return true;}
+      if(($propiedad->precio < 0) || ($propiedad->metros_cuadrados <= 0) || ($propiedad->ambientes < 0) || ($propiedad->banios < 0)){return true;}
+      
       return false;
     }
 
