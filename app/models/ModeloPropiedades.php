@@ -81,9 +81,15 @@
       return false;
     }
 
-    function editPropiedad($propiedad){
-      $query = $this->db->prepare("UPDATE tb_propiedad SET `titulo` = ?,`tipo` = ?,`operacion` = ?,`descripcion`= ?,`precio` = ?,`metros_cuadrados`,`ambientes` = ?,`banios` = ?,`permite_mascotas` = ?,`propietario` = ?  WHERE `dni` = ?");
-      $query->execute([$propiedad->titulo, $propiedad->tipo, $propiedad->operacion, $propiedad->descripcion, $propiedad->precio, $propiedad->metros_cuadrados, $propiedad->ambientes, $propiedad->banios, $propiedad->permite_mascotas, $propiedad->propietario]);
+    function editar($propiedad){
+      try {
+        $query = $this->db->prepare("UPDATE tb_propiedad SET `titulo` = ?,`tipo` = ?,`operacion` = ?,`descripcion`= ?,`precio` = ?,`metros_cuadrados` = ?,`ambientes` = ?,`banios` = ?,`permite_mascotas` = ?,`propietario` = ?  WHERE `id` = ?");
+        $query->execute([$propiedad->titulo, $propiedad->tipo, $propiedad->operacion, $propiedad->descripcion, $propiedad->precio, $propiedad->metros_cuadrados, $propiedad->ambientes, $propiedad->banios, $propiedad->permite_mascotas, $propiedad->propietario, $propiedad->id]);
+        // Devuelve la propiedad editada
+        return $propiedad;   
+      } catch (\Throwable $th) {
+        return null;
+      }
     }
 
     public function inputsInvalidos($propiedad){

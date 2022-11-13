@@ -99,24 +99,43 @@
       $propiedadEliminada = $this->modeloPropiedades->eliminar($id);
       // Se verifica si $propiedadEliminada tiene o no el ultimo eliminado
       if (is_null($propiedadEliminada))
-        $this->view->response("Peticion abortada por posible inyeccion", 403);  
+        $this->view->response("Peticion abortada, hubo un error al eliminar la propiedad", 403);  
       else
         $this->view->response($propiedadEliminada, 200);
     }
 
+    public function validarTodo($propiedad){
+      // Validaciones
+      if($this->modeloPropiedades->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); die();};
+      if($this->modeloPropiedades->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400); die();};
+      if(!$this->modeloPropietarios->existePropietario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$propiedad->propietario}'"); die();}
+    }
+
     public function agregarPropiedad($params = null) {
       $propiedad = $this->getData();
-      
-      // Validaciones
-      if($this->modeloPropiedades->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); return; die();};
-      if($this->modeloPropiedades->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400);return; die();};
-      if(!$this->modeloPropietarios->existePropietario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$$propiedad->propietario}'"); return; die();}
-      
+      $this->validarTodo($propiedad);
+
       $nuevaPropiedad = $this->modeloPropiedades->agregarPropiedad($propiedad);
       if(is_null($nuevaPropiedad))
-        $this->view->response("Peticion abortada por posible inyeccion", 403);  
+        $this->view->response("Peticion abortada, hubo un error al agregar la propiedad", 403);  
       else
         $this->view->response($nuevaPropiedad, 201);
+    }
+    
+    function editarPropiedad(){
+      $propiedad = $this->getData();
+      $this->validarTodo($propiedad);
+      $existe = $this->modeloPropiedades->existePropiedad($propiedad->id);
+      if(!$existe){$this->view->response("La propiedad con el id '{$propiedad->id}' no existe", 404); die();}
+      
+      $existe = $this->modeloPropietarios->existePropietario($propiedad->propietario);
+      if(!$existe){$this->view->response("No existe ningun propietario con el id '{$propiedad->id}'.", 404); die();}
+      
+      $propiedadEditada = $this->modeloPropiedades->editar($propiedad);
+      if(is_null($propiedadEditada))
+        $this->view->response("Peticion abortada, no se pudo editar la propiedad", 403);
+      else
+        $this->view->response($propiedadEditada, 200);
     }
 
   }
