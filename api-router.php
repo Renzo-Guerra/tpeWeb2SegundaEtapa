@@ -14,5 +14,8 @@
 
 // Rutas con propietarios
   $router->addRoute('propietarios', 'GET', 'ControladorPropietariosApi', 'getPropietarios');
+  $router->addRoute('propietarios/:DNI', 'GET', 'ControladorPropietariosApi', 'getPropietario');
+  $router->addRoute('propietarios/:DNI', 'DELETE', 'ControladorPropietariosApi', 'eliminarPropietario');
+  $router->addRoute('propietarios', 'POST', 'ControladorPropietariosApi', 'agregarPropietario'); 
   // ejecuta la ruta (sea cual sea)
   $router->route($_GET["resourse"], $_SERVER['REQUEST_METHOD']);
