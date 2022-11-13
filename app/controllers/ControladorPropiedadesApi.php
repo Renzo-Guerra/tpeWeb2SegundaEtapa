@@ -56,7 +56,6 @@
         $propiedades = $this->modeloPropiedades->getPropiedadesDonde($valor, $atributo);
       }else if(($atributo != null) && ($orden != null)){
         // Este seria la busqueda del opcional 9 
-        echo("xd");
         $propiedades = $this->modeloPropiedades->getPropiedadesOrdenadas($orden, $atributo);
       }else if($orden != null){
         // Este seria la busqueda del obligatorio 3
@@ -108,12 +107,12 @@
       // Validaciones
       if($this->modeloPropiedades->camposInvalidos($propiedad)){$this->view->response("Complete los datos", 400); die();};
       if($this->modeloPropiedades->inputsInvalidos($propiedad)){$this->view->response("Dato inesperado", 400); die();};
-      if(!$this->modeloPropietarios->existePropietario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$propiedad->propietario}'"); die();}
     }
 
     public function agregarPropiedad($params = null) {
       $propiedad = $this->getData();
       $this->validarTodo($propiedad);
+      if(!$this->modeloPropietarios->existePropietario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$propiedad->propietario}'"); die();}
 
       $nuevaPropiedad = $this->modeloPropiedades->agregarPropiedad($propiedad);
       if(is_null($nuevaPropiedad))
@@ -121,7 +120,7 @@
       else
         $this->view->response($nuevaPropiedad, 201);
     }
-    
+
     function editarPropiedad(){
       $propiedad = $this->getData();
       $this->validarTodo($propiedad);

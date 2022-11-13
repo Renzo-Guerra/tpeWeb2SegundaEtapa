@@ -70,9 +70,15 @@
       }
     }
 
-    function editUser($propietario){
-      $query = $this->db->prepare("UPDATE tb_propietario SET `nombre` = ?,`apellido` = ?,`telefono` = ?,`mail`= ?  WHERE `dni` = ?");
-      $query->execute([$propietario->nombre, $propietario->apellido, $propietario->telefono, $propietario->mail, $propietario->dni]);
+    function editar($propietario){
+      try {
+        $query = $this->db->prepare("UPDATE tb_propietario SET `nombre` = ?,`apellido` = ?,`telefono` = ?,`mail`= ?  WHERE `dni` = ?");
+        $query->execute([$propietario->nombre, $propietario->apellido, $propietario->telefono, $propietario->mail, $propietario->dni]);
+        return $propietario;
+      } catch (\Throwable $th) {
+        return null;
+      }
+      
     }
     
 

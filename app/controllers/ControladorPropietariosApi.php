@@ -1,5 +1,4 @@
 <?php
-  require_once './app/models/ModeloPropiedades.php';
   require_once './app/models/ModeloPropietarios.php';
   require_once './app/views/ApiView.php';
   require_once './app/Helper.php';
@@ -103,20 +102,33 @@
 
     public function agregarPropietario($params = null) {
       $propietario = $this->getData();
-      
-      // Validaciones
-      if($this->modeloPropietarios->inputsInvalidos($propietario)){$this->view->response("Falto completar algun dato, o un dato es invalido", 400);return; die();};
-      if($this->modeloPropietarios->camposInvalidos($propietario)){$this->view->response("Complete los datos", 400); return; die();};
-      if($this->modeloPropietarios->existePropietario($propietario->dni)){$this->view->response("Ya existe un usuario con el dni '{$propietario->dni}'", 403); return; die();}
+      $this->validarTodo($propietario);
       
       $agregado = $this->modeloPropietarios->agregarPropietario($propietario);
-      print_r($agregado);
       if(is_null($agregado))
         $this->view->response("Peticion abortada por posible inyeccion", 403);  
       else
         $this->view->response("Nueva propietario agregado", 201);
     }
 
+    public function validarTodo($propietario){
+      // Validaciones
+      if($this->modeloPropietarios->camposInvalidos($propietario)){$this->view->response("Complete los datos", 400); die();};
+      if($this->modeloPropietarios->inputsInvalidos($propietario)){$this->view->response("Dato inesperado", 400); die();};
+    }
 
+    public function editarPropietario(){
+      $propietario = $this->getData();
+      $this->validarTodo($propietario);
+      
+      $existe = $this->modeloPropietarios->existePropietario($propietario->dni);
+      if(!$existe){$this->view->response("No existe ningun propietario con el dni '{$propietario->dni}'.", 404); die();}
+      
+      $propietarioEditado = $this->modeloPropietarios->editar($propietario);
+      if(is_null($propietarioEditado))
+        $this->view->response("Peticion abortada, no se pudo editar la propiedad", 403);
+      else
+        $this->view->response($propietarioEditado, 200);
+    }
 
   }
