@@ -1,5 +1,10 @@
 <?php
   class Helper{
+    private $vista;
+
+    public function __construct(){
+      $vista = new Vista();
+    }
     
     // Valida que el orden pasado (en caso de no ser null) sea los aceptados por mi documentacion
     public function validarOrden($orden){
@@ -9,13 +14,15 @@
     }
 
     public function combinacionDeParametrosValidos($orden, $atributo, $valor){
-      // Podria haber hecho esas 3 validaciones en 1 sola, pero queria que cada una tenga un mensaje "unico"
       if( (($orden != null) && ($atributo != null) && ($valor != null)) || 
           (($orden != null) && ($valor != null)) || 
           (($orden == null) && ($atributo == null) && ($valor != null)) ){ // Se supone que para eso esta el endpoint con /:ID || /:DNI
-          return false;
+            $this->view->response("Error, no se sabe que hacer con esa peticion (combinacion de parametros no declarada).", 400); die();
       }
-      
-      return true;
+    }
+
+    public function getData(){
+      // lee el body del request y lo transforma de json a objeto.
+      return json_decode(file_get_contents("php://input"));
     }
   }

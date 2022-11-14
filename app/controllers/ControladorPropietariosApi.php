@@ -6,22 +6,14 @@
   class ControladorPropietariosApi{
     private $modeloPropietarios;
     private $view;
-    private $data;
     private $helper;
 
     public function __construct() {
       $this->modeloPropietarios = new ModeloPropietarios();
       $this->view = new ApiView();
       $this->helper = new Helper();
-      
-      // lee el body del request
-      $this->data = file_get_contents("php://input");
     }
 
-    private function getData() {
-      return json_decode($this->data);
-    }
-    
     /**
      * - Requerimiento funcional optativo numero 9.
      * - (A su vez es el requerimiento funcional obligatorio numero 3).
@@ -39,11 +31,8 @@
       // Validaciones
       $this->helper->validarOrden($orden);       
       $this->validarColumna($atributo);
+      $this->helper->combinacionDeParametrosValidos($orden, $atributo, $valor);
       
-      $esValido = $this->helper->combinacionDeParametrosValidos($orden, $atributo, $valor);
-      if(!$esValido){
-        $this->view->response("Error, no se sabe que hacer con esa peticion (combinacion de parametros no declarada).", 400); die();
-      }
       // Casos exitosos
       if(($atributo == null) && ($valor == null) && ($orden == null)){
         // Caso "vanilla"
@@ -101,7 +90,7 @@
     }
 
     public function agregarPropietario($params = null) {
-      $propietario = $this->getData();
+      $propietario = $this->helper->getData();
       $this->validarTodo($propietario);
       
       $agregado = $this->modeloPropietarios->agregarPropietario($propietario);
@@ -118,7 +107,7 @@
     }
 
     public function editarPropietario(){
-      $propietario = $this->getData();
+      $propietario = $this->helper->getData();
       $this->validarTodo($propietario);
       
       $existe = $this->modeloPropietarios->existePropietario($propietario->dni);

@@ -8,7 +8,6 @@
     private $modeloPropiedades;
     private $modeloPropietarios;
     private $view;
-    private $data;
     private $helper;
 
     public function __construct() {
@@ -16,13 +15,6 @@
       $this->modeloPropietarios = new ModeloPropietarios();
       $this->view = new ApiView();
       $this->helper = new Helper();
-      
-      // lee el body del request
-      $this->data = file_get_contents("php://input");
-    }
-
-    private function getData() {
-      return json_decode($this->data);
     }
     
     /**
@@ -42,11 +34,8 @@
       // Validaciones
       $this->helper->validarOrden($orden);       
       $this->validarColumna($atributo);
+      $this->helper->combinacionDeParametrosValidos($orden, $atributo, $valor);
 
-      $esValido = $this->helper->combinacionDeParametrosValidos($orden, $atributo, $valor);
-      if(!$esValido){
-        $this->view->response("Error, no se sabe que hacer con esa peticion (combinacion de parametros no declarada).", 400); die();
-      }
       // Casos exitosos
       if(($atributo == null) && ($valor == null) && ($orden == null)){
         // Caso "vanilla"
@@ -110,7 +99,7 @@
     }
 
     public function agregarPropiedad($params = null) {
-      $propiedad = $this->getData();
+      $propiedad = $this->helper->getData();
       $this->validarTodo($propiedad);
       if(!$this->modeloPropietarios->existePropietario($propiedad->propietario)){$this->view->response("No se pudo agregar la propiedad porque no existe el usuario '{$propiedad->propietario}'"); die();}
 
@@ -122,7 +111,7 @@
     }
 
     function editarPropiedad(){
-      $propiedad = $this->getData();
+      $propiedad = $this->helper->getData();
       $this->validarTodo($propiedad);
       $existe = $this->modeloPropiedades->existePropiedad($propiedad->id);
       if(!$existe){$this->view->response("La propiedad con el id '{$propiedad->id}' no existe", 404); die();}
