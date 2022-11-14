@@ -7,18 +7,18 @@
   $router = new Router();
 
   // Rutas con propiedades
-  $router->addRoute('propiedades', 'GET', 'ControladorPropiedadesApi', 'getPropiedades');
-  $router->addRoute('propiedades/:ID', 'GET', 'ControladorPropiedadesApi', 'getPropiedad');
-  $router->addRoute('propiedades/:ID', 'DELETE', 'ControladorPropiedadesApi', 'eliminarPropiedad');
-  $router->addRoute('propiedades', 'POST', 'ControladorPropiedadesApi', 'agregarPropiedad'); 
-  $router->addRoute('propiedades', 'PUT', 'ControladorPropiedadesApi', 'editarPropiedad'); 
+  $router->addRoute('propiedades', 'GET', 'ControladorPropiedadesApi', 'getElementos');
+  $router->addRoute('propiedades/:ID', 'GET', 'ControladorPropiedadesApi', 'getElemento');
+  $router->addRoute('propiedades/:ID', 'DELETE', 'ControladorPropiedadesApi', 'eliminarElemento');
+  $router->addRoute('propiedades', 'POST', 'ControladorPropiedadesApi', 'agregarElemento'); 
+  $router->addRoute('propiedades', 'PUT', 'ControladorPropiedadesApi', 'editarElemento'); 
 
 // Rutas con propietarios
-  $router->addRoute('propietarios', 'GET', 'ControladorPropietariosApi', 'getPropietarios');
-  $router->addRoute('propietarios/:DNI', 'GET', 'ControladorPropietariosApi', 'getPropietario');
-  $router->addRoute('propietarios/:DNI', 'DELETE', 'ControladorPropietariosApi', 'eliminarPropietario');
-  $router->addRoute('propietarios', 'POST', 'ControladorPropietariosApi', 'agregarPropietario'); 
-  $router->addRoute('propietarios', 'PUT', 'ControladorPropietariosApi', 'editarPropietario'); 
+  $router->addRoute('propietarios', 'GET', 'ControladorPropietariosApi', 'getElementos');
+  $router->addRoute('propietarios/:DNI', 'GET', 'ControladorPropietariosApi', 'getElemento');
+  $router->addRoute('propietarios/:DNI', 'DELETE', 'ControladorPropietariosApi', 'eliminarElemento');
+  $router->addRoute('propietarios', 'POST', 'ControladorPropietariosApi', 'agregarElemento'); 
+  $router->addRoute('propietarios', 'PUT', 'ControladorPropietariosApi', 'editarElemento'); 
   
   // ejecuta la ruta (sea cual sea)
   $router->route($_GET["resourse"], $_SERVER['REQUEST_METHOD']);
