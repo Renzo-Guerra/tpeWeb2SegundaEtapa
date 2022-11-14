@@ -104,8 +104,8 @@
     }
 
     public function validarCampos($elemento){
-      if($this->modelo->inputsInvalidos($elemento)){$this->vista->response("Dato inesperado", 400); die();};
       if($this->modelo->camposInvalidos($elemento)){$this->vista->response("Complete los datos", 400); die();};
+      if($this->modelo->inputsInvalidos($elemento)){$this->vista->response("Dato inesperado", 400); die();};
     }
 
     public abstract function validarParaAgregar($elemento);
