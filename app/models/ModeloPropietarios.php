@@ -7,6 +7,12 @@
     }
 
     /**
+    ! NOTA: Tanto getElementosOrdenados(), getElementosDonde(), agregar(), eliminar() y editar()
+    ! no pudieron ser abstraidos para que esten declarados en Modelo.php debido a los valores por default 
+    ! que estos llevan, o por que la primary key del WHERE en el query cambia en base a la tabla.
+     */
+
+    /**
      *  Devuelve todos los propietarios ordenadas ascendente o descendentemente por 
      *  una columna de la tabla especificada (En caso de no pasar $atributo, por default toma "apellido").
      */
